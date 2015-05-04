@@ -7,12 +7,14 @@ use LoLCompanion\User;
 use LoLCompanion\Message;
 
 
-class Chat implements MessageComponentInterface {
+class App implements MessageComponentInterface {
     protected $clients;
+	protected $games;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
 		UserManager::init();
+		GameManage::init();
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -23,32 +25,41 @@ class Chat implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
+		echo "[DEBUG] " . $msg;
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::find($from);
 		$user = $response['user'];
 		
 		$action = $jsonMsg['action'];
 		switch($action){
-			case 'connection':
-				if(isset($jsonMsg['nickname']) && !empty($jsonMsg['nickname'])){
-					$user->nickname = $jsonMsg['nickname'];
+			case 'pickedChampion':
+				$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
+				if($response['error'] === false){
+					$user->requestPickedChampion($jsonMsg['gameId'], $jsonMsg['teamId'], $jsonMsg['championIconId'], $jsonMsg['passphrase']);
 					UserManager::update($user);
-					Message::send(
+					$game = GameManager::createIfNotExists($jsonMsg['gameId']);
+					$game->addUserToRoom($user, $json['teamId']);
+					
+					Message::sendJSON(
 						array($user), 
-						'"action":"connection", "status":"200"'
+						array(
+							'action' => 'firstMessage',
+							'error' => false,
+							'allies' => array(1, 2, 3)
+						)
 					);
 				} else {
 					Message::send(
 						array($user), 
-						'"action":"connection", "status":"400", "message":"Bad Request : Missing \'nickname\' argument."'
+						'pickedChampion',
+						true,
+						'Bad Request : ' . $response['message']
 					);
 				}
-				
 				break;
-			
+				
 			default:
 				echo "[ERROR] Unsupported message format : " . $msg;
-				var_dump($jsonMsg);
 				break;
 		}
 		

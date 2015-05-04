@@ -6,9 +6,16 @@ class Message {
 		return json_decode($jsonMsg, true);
 	}
 	
-	public static function send($clients, $msg){
+	public static function send($clients, $action, $errorStatus, $message){
+		$msg = '"action":"' . $action . '", "error":'. $errorStatus .', "message":"' . $message . '"';
 		foreach($clients as $client){
 			$client->getConnection()->send($msg);
+		}
+	}
+	
+	public static function sendJson($clients, $array){
+		foreach($clients as $client){
+			$client->getConnection()->send(json_encode($array));
 		}
 	}
 }

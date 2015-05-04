@@ -3,11 +3,17 @@ namespace LoLCompanion;
 
 class User {
     protected $connection;
-	public $nickname;
+	public $gameId;
+	public $teamId;
+	public $championIconId;
+	public $passphrase;
 	
 	public function __construct($conn){
 		$this->connection = $conn;
-		$this->nickname = "Unknown";
+		$this->gameId = -1;
+		$this->teamId = -1;
+		$this->championIconId = -1;
+		$this->passphrase = '';
 	}
 	
 	public function getConnectionID(){
@@ -16,5 +22,12 @@ class User {
 	
 	public function getConnection(){
 		return $this->connection;
+	}
+	
+	public function requestPickedChampion($gameId, $teamId, $championIconId, $passphrase){
+		$this->gameId = $gameId;
+		$this->teamId = $teamId;
+		$this->championIconId = $championIconId;
+		$this->passphrase = $passphrase;
 	}
 }

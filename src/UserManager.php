@@ -27,14 +27,12 @@ class UserManager {
 			'index' => -1,
 		);
 		
-		$i = 0;
-		foreach(self::$users as $user){
+		foreach(self::$users as $index => $user){
 			if($user->getConnectionID() == $conn->resourceId){
 				$response['user'] = $user;
-				$response['index'] = $i;
+				$response['index'] = $index;
 				break;
 			}
-			$i++;
 		}
 		
 		return $response;
