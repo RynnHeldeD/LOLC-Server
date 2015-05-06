@@ -13,9 +13,9 @@ class Message {
 		}
 	}
 	
-	public static function sendJson($clients, $array){
-		foreach($clients as $client){
-			$client->getConnection()->send(json_encode($array));
+	public static function sendJson($users, $array){
+		foreach($users as $user){;
+			$user->getConnection()->send(json_encode($array));
 		}
 	}
 }

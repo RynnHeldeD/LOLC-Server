@@ -11,8 +11,9 @@ class GameManager {
 	
 	public static function createIfNotExists($gameId){
 		$response = self::getGame($gameId);
+		$game = null;
 		
-		if($response['game'] != null)){
+		if($response['game'] == null){
 			$game = new Game($gameId);
 			array_push(self::$games, new Game($gameId));
 		} else {

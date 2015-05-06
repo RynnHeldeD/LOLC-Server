@@ -19,4 +19,32 @@ class Game {
 			$this->blueRoom->addUser($user);
 		}
 	}
+	
+	public function getRoom($teamId){
+		$room = null;
+		
+		if($teamId == Team::$purple){
+			$room = $this->purpleRoom; 
+		} elseif ($teamId == Team::$blue) {
+			$room = $this->blueRoom;
+		}
+		
+		return $room;
+	}
+	
+	public function getUsersFromRoom($teamId, $passphrase = null){
+		$users = array();
+		
+		if($passphrase != null){
+			foreach($this->getRoom($teamId)->getUsers() as $user){
+				if($user->passphrase == $passphrase){
+					$users[] = $user;
+				}
+			}
+		} else {
+			$users = $this->getRoom($teamId)->getUsers();
+		}
+		
+		return $users;
+	}
 }

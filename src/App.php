@@ -14,7 +14,7 @@ class App implements MessageComponentInterface {
     public function __construct() {
         $this->clients = new \SplObjectStorage;
 		UserManager::init();
-		GameManage::init();
+		GameManager::init();
     }
 
     public function onOpen(ConnectionInterface $conn) {
@@ -25,7 +25,7 @@ class App implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-		echo "[DEBUG] " . $msg;
+		echo "\r\n[GET] " . $msg . "\r\n";
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::find($from);
 		$user = $response['user'];
@@ -35,17 +35,22 @@ class App implements MessageComponentInterface {
 			case 'pickedChampion':
 				$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
 				if($response['error'] === false){
+					// User
 					$user->requestPickedChampion($jsonMsg['gameId'], $jsonMsg['teamId'], $jsonMsg['championIconId'], $jsonMsg['passphrase']);
 					UserManager::update($user);
-					$game = GameManager::createIfNotExists($jsonMsg['gameId']);
-					$game->addUserToRoom($user, $json['teamId']);
 					
+					// Game
+					$game = GameManager::createIfNotExists($user->gameId);
+					$game->addUserToRoom($user, $user->teamId);
+					$allies = $game->getUsersFromRoom($user->teamId, $user->passphrase);
+					
+					// Response
 					Message::sendJSON(
-						array($user), 
+						$allies, 
 						array(
-							'action' => 'firstMessage',
+							'action' => 'playerList',
 							'error' => false,
-							'allies' => array(1, 2, 3)
+							'allies' => User::getUsersChampionsIconsId($allies)
 						)
 					);
 				} else {

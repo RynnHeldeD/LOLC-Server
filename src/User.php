@@ -30,4 +30,14 @@ class User {
 		$this->championIconId = $championIconId;
 		$this->passphrase = $passphrase;
 	}
+	
+	public static function getUsersChampionsIconsId($users){
+		$championsIconsId = array();
+		
+		foreach($users as $user){
+			$championsIconsId[] = $user->championIconId;
+		}
+		
+		return $championsIconsId;
+	}
 }

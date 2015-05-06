@@ -29,10 +29,10 @@ class Room {
 		}
 	}
 	
-	public static function getUser($user){
+	public function getUser($user){
 		$response = array('user' => null, 'index' => null);
 		
-		foreach(self::$users as $index => $u){
+		foreach($this->users as $index => $u){
 			if($u->getConnectionId() === $user->getConnectionId()){
 				$response['user'] = $u;
 				$response['index'] = $index;
@@ -41,5 +41,9 @@ class Room {
 		}
 		
 		return $response;
+	}
+	
+	public function getUsers(){
+		return $this->users;
 	}
 }
