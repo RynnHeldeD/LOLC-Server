@@ -62,24 +62,75 @@ class App implements MessageComponentInterface {
 					);
 				}
 				break;
+			
+			case 'timerActivation':
+				$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
+				if($response['error'] === false){
+					$response = GameManager::getGame($user->gameId);
+					$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					
+					// Response
+					Message::sendJSON(
+						$allies, 
+						array(
+							'action' => 'timer',
+							'error' => false,
+							'idSortGrille' => $jsonMsg['idSortGrille']
+						)
+					);
+				}
+				break;
 				
+			case 'switchChannel':
+			
+				break;
+				
+			case 'timerDelay':
+				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+					if($response['error'] === false){
+						$response = GameManager::getGame($user->gameId);
+						$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+						
+						// Response
+						Message::sendJSON(
+							$allies, 
+							array(
+								'action' => 'timerDelay',
+								'error' => false,
+								'idSortGrille' => $jsonMsg['idSortGrille']
+							)
+						);
+					}
+				break;
+				
+			case 'RaZTimer':
+				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+					if($response['error'] === false){
+						$response = GameManager::getGame($user->gameId);
+						$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+						
+						// Response
+						Message::sendJSON(
+							$allies, 
+							array(
+								'action' => 'RaZTimer',
+								'error' => false,
+								'idSortGrille' => $jsonMsg['idSortGrille']
+							)
+						);
+					}
+				break;
+			
 			default:
 				echo "[ERROR] Unsupported message format : " . $msg;
+				Message::send(
+						array($user), 
+						$action,
+						true,
+						'Bad Request'
+					);
 				break;
 		}
-		
-		/*
-        $numRecv = count($this->clients) - 1;
-        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($msg);
-            }
-        }
-		*/
     }
 
     public function onClose(ConnectionInterface $conn) {

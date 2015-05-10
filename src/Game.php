@@ -32,13 +32,15 @@ class Game {
 		return $room;
 	}
 	
-	public function getUsersFromRoom($teamId, $passphrase = null){
+	public function getUsersFromRoom($teamId, $passphrase = null, $exclude = null){
 		$users = array();
 		
 		if($passphrase != null){
 			foreach($this->getRoom($teamId)->getUsers() as $user){
 				if($user->passphrase == $passphrase){
-					$users[] = $user;
+					if($user != $exclude){
+						$users[] = $user;
+					}
 				}
 			}
 		} else {
