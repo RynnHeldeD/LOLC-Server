@@ -14,6 +14,12 @@ class UserManager {
 		array_push(self::$users, $user);
 	}
 	
+	public static function remove($conn){
+		$userResponse = self::find($conn);
+		$gameResponse = GameManager::getGame($userResponse['user']->gameId);
+		$gameResponse['game']->removeUser($userResponse['user']);
+	}
+	
 	public static function update($user){
 		$response = self::find($user->getConnection());
 		if($response['index'] != -1){

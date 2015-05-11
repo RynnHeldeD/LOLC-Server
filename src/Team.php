@@ -2,6 +2,6 @@
 namespace LoLCompanion;
 
 class Team {
-    public static $purple = 100;
-    public static $blue = 200;
+    public static $blue = 100;
+    public static $purple = 200;
 }

@@ -9,7 +9,7 @@ class Tool {
 		);
 		
 		foreach($variablesNames as $var){
-			if(!isset($array[$var]) || $array[$var] == "" || $array[$var] == null){
+			if(!isset($array[$var])){
 				$response['error'] = true;
 				$response['message'] = "'$var' " . 'argument is missing.';
 				break;

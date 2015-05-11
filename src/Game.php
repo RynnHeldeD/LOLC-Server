@@ -31,6 +31,20 @@ class Game {
 		}
 	}
 	
+	public function removeUser($user){
+		$room = $this->getRoom($user->teamId)->removeUser($user);
+		$allies = $this->getUsersFromRoom($user);
+
+		Message::sendJSON(
+			$allies, 
+			array(
+				'action' => 'playerList',
+				'error' => false,
+				'allies' => User::getUsersChampionsIconsId($allies)
+			)
+		);
+	}
+	
 	public function getRoom($teamId){
 		$room = null;
 		
@@ -43,19 +57,25 @@ class Game {
 		return $room;
 	}
 	
-	public function getUsersFromRoom($teamId, $passphrase = null, $exclude = null){
+	public function getUsersFromRoom($user, $selfExclude = false){
 		$users = array();
-		
-		if($passphrase != null){
-			foreach($this->getRoom($teamId)->getUsers() as $user){
-				if($user->passphrase == $passphrase){
-					if($user != $exclude){
-						$users[] = $user;
+
+		if(!empty($user->passphrase)){
+			foreach($this->getRoom($user->teamId)->getUsers() as $u){
+				if(!empty($u->passphrase) && $user->passphrase == $u->passphrase){
+					if($u == $user){
+						if(!$selfExclude){
+							$users[] = $u;
+						}
+					} else {
+						$users[] = $u;
 					}
 				}
 			}
 		} else {
-			$users = $this->getRoom($teamId)->getUsers();
+			if(!$selfExclude){
+				$users[] = $user;
+			}
 		}
 		
 		return $users;

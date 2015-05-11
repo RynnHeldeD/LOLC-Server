@@ -33,7 +33,7 @@ class Room {
 		$response = array('user' => null, 'index' => null);
 		
 		foreach($this->users as $index => $u){
-			if($u->getConnectionId() === $user->getConnectionId()){
+			if($u->getConnectionId() == $user->getConnectionId()){
 				$response['user'] = $u;
 				$response['index'] = $index;
 				break;

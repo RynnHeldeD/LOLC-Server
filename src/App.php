@@ -42,7 +42,7 @@ class App implements MessageComponentInterface {
 					// Game
 					$game = GameManager::createIfNotExists($user->gameId);
 					$game->addUserToRoom($user, $user->teamId);
-					$allies = $game->getUsersFromRoom($user->teamId, $user->passphrase);
+					$allies = $game->getUsersFromRoom($user);
 					
 					// Response
 					Message::sendJSON(
@@ -67,7 +67,7 @@ class App implements MessageComponentInterface {
 				$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
 				if($response['error'] === false){
 					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					$allies = $response['game']->getUsersFromRoom($user, true);
 					
 					// Response
 					Message::sendJSON(
@@ -75,7 +75,8 @@ class App implements MessageComponentInterface {
 						array(
 							'action' => 'timer',
 							'error' => false,
-							'idSortGrille' => $jsonMsg['idSortGrille']
+							'idSortGrille' => $jsonMsg['idSortGrille'],
+							'timestampDeclenchement' => $jsonMsg['timestampDeclenchement']
 						)
 					);
 				} else {
@@ -89,14 +90,10 @@ class App implements MessageComponentInterface {
 				break;
 				
 			case 'switchChannel':
-				$response = Tool::checkVariables($jsonMsg, array('channel', 'oldChannel'));
+				$response = Tool::checkVariables($jsonMsg, array('channel'));
 				if($response['error'] === false){
 					$response = GameManager::getGame($user->gameId);
-					$oldAllies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
-					$user->passphrase = $jsonMsg['channel'];
-					UserManager::update($user);
-					$newAllies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase);
-					
+					$oldAllies = $response['game']->getUsersFromRoom($user, true);
 					Message::sendJSON(
 						$oldAllies, 
 						array(
@@ -105,6 +102,10 @@ class App implements MessageComponentInterface {
 							'allies' => User::getUsersChampionsIconsId($oldAllies)
 						)
 					);
+					
+					$user->passphrase = $jsonMsg['channel'];
+					UserManager::update($user);
+					$newAllies = $response['game']->getUsersFromRoom($user);
 					
 					Message::sendJSON(
 						$newAllies, 
@@ -128,7 +129,7 @@ class App implements MessageComponentInterface {
 				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
 				if($response['error'] === false){
 					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					$allies = $response['game']->getUsersFromRoom($user, true);
 					
 					// Response
 					Message::sendJSON(
@@ -149,17 +150,17 @@ class App implements MessageComponentInterface {
 				}
 				break;
 				
-			case 'RaZTimer':
+			case 'razTimer':
 				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
 				if($response['error'] === false){
 					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					$allies = $response['game']->getUsersFromRoom($user, true);
 					
 					// Response
 					Message::sendJSON(
 						$allies, 
 						array(
-							'action' => 'RaZTimer',
+							'action' => 'razTimer',
 							'error' => false,
 							'idSortGrille' => $jsonMsg['idSortGrille']
 						)
@@ -188,8 +189,9 @@ class App implements MessageComponentInterface {
 
     public function onClose(ConnectionInterface $conn) {
         // The connection is closed, remove it, as we can no longer send it messages
+		UserManager::remove($conn);
         $this->clients->detach($conn);
-
+		
         echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
