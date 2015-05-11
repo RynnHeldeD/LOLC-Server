@@ -12,6 +12,17 @@ class Game {
 		$this->blueRoom = new Room($gameId, Team::$blue);
 	}
 	
+	public function vardump(){
+		echo "PURPLE\r\n";
+		foreach($this->purpleRoom->getUsers() as $user){
+			echo $user->championIconId ."\r\n";
+		}
+		echo "BLUE\r\n";
+		foreach($this->blueRoom->getUsers() as $user){
+			echo $user->championIconId ."\r\n";
+		}
+	}
+	
 	public function addUserToRoom($user, $roomId){
 		if($roomId == Team::$purple){
 			$this->purpleRoom->addUser($user);

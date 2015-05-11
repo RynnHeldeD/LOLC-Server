@@ -13,9 +13,9 @@ class GameManager {
 		$response = self::getGame($gameId);
 		$game = null;
 		
-		if($response['game'] == null){
+		if($response['game'] === null){
 			$game = new Game($gameId);
-			array_push(self::$games, new Game($gameId));
+			array_push(self::$games, $game);
 		} else {
 			$game = $response['game'];
 		}

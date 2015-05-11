@@ -56,7 +56,7 @@ class App implements MessageComponentInterface {
 				} else {
 					Message::send(
 						array($user), 
-						'pickedChampion',
+						$action,
 						true,
 						'Bad Request : ' . $response['message']
 					);
@@ -78,47 +78,100 @@ class App implements MessageComponentInterface {
 							'idSortGrille' => $jsonMsg['idSortGrille']
 						)
 					);
+				} else {
+					Message::send(
+						array($user), 
+						$action,
+						true,
+						'Bad Request : ' . $response['message']
+					);
 				}
 				break;
 				
 			case 'switchChannel':
-			
+				$response = Tool::checkVariables($jsonMsg, array('channel', 'oldChannel'));
+				if($response['error'] === false){
+					$response = GameManager::getGame($user->gameId);
+					$oldAllies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					$user->passphrase = $jsonMsg['channel'];
+					UserManager::update($user);
+					$newAllies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase);
+					
+					Message::sendJSON(
+						$oldAllies, 
+						array(
+							'action' => 'playerList',
+							'error' => false,
+							'allies' => User::getUsersChampionsIconsId($oldAllies)
+						)
+					);
+					
+					Message::sendJSON(
+						$newAllies, 
+						array(
+							'action' => 'playerList',
+							'error' => false,
+							'allies' => User::getUsersChampionsIconsId($newAllies)
+						)
+					);
+				} else {
+					Message::send(
+						array($user), 
+						$action,
+						true,
+						'Bad Request : ' . $response['message']
+					);
+				}
 				break;
 				
 			case 'timerDelay':
 				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
-					if($response['error'] === false){
-						$response = GameManager::getGame($user->gameId);
-						$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
-						
-						// Response
-						Message::sendJSON(
-							$allies, 
-							array(
-								'action' => 'timerDelay',
-								'error' => false,
-								'idSortGrille' => $jsonMsg['idSortGrille']
-							)
-						);
-					}
+				if($response['error'] === false){
+					$response = GameManager::getGame($user->gameId);
+					$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					
+					// Response
+					Message::sendJSON(
+						$allies, 
+						array(
+							'action' => 'timerDelay',
+							'error' => false,
+							'idSortGrille' => $jsonMsg['idSortGrille']
+						)
+					);
+				} else {
+					Message::send(
+						array($user), 
+						$action,
+						true,
+						'Bad Request : ' . $response['message']
+					);
+				}
 				break;
 				
 			case 'RaZTimer':
 				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
-					if($response['error'] === false){
-						$response = GameManager::getGame($user->gameId);
-						$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
-						
-						// Response
-						Message::sendJSON(
-							$allies, 
-							array(
-								'action' => 'RaZTimer',
-								'error' => false,
-								'idSortGrille' => $jsonMsg['idSortGrille']
-							)
-						);
-					}
+				if($response['error'] === false){
+					$response = GameManager::getGame($user->gameId);
+					$allies = $response['game']->getUsersFromRoom($user->teamId, $user->passphrase, $user);
+					
+					// Response
+					Message::sendJSON(
+						$allies, 
+						array(
+							'action' => 'RaZTimer',
+							'error' => false,
+							'idSortGrille' => $jsonMsg['idSortGrille']
+						)
+					);
+				} else {
+					Message::send(
+						array($user), 
+						$action,
+						true,
+						'Bad Request : ' . $response['message']
+					);
+				}
 				break;
 			
 			default:
@@ -127,7 +180,7 @@ class App implements MessageComponentInterface {
 						array($user), 
 						$action,
 						true,
-						'Bad Request'
+						'Bad Request : Unsupported message format : ' . $msg
 					);
 				break;
 		}
