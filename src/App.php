@@ -151,7 +151,7 @@ class App implements MessageComponentInterface {
 				break;
 				
 			case 'razTimer':
-				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+				$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
 				if($response['error'] === false){
 					$response = GameManager::getGame($user->gameId);
 					$allies = $response['game']->getUsersFromRoom($user, true);
@@ -162,7 +162,8 @@ class App implements MessageComponentInterface {
 						array(
 							'action' => 'razTimer',
 							'error' => false,
-							'idSortGrille' => $jsonMsg['idSortGrille']
+							'idSortGrille' => $jsonMsg['idSortGrille'],
+							'timestampDeclenchement' => $jsonMsg['timestampDeclenchement']
 						)
 					);
 				} else {
