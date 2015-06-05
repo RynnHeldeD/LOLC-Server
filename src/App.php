@@ -97,7 +97,7 @@ class App implements MessageComponentInterface {
 					Message::sendJSON(
 						$oldAllies, 
 						array(
-							'action' => 'playerList',
+							'action' => 'playerList_toOldAllies',
 							'error' => false,
 							'allies' => User::getUsersChampionsIconsId($oldAllies)
 						)
@@ -110,7 +110,7 @@ class App implements MessageComponentInterface {
 					Message::sendJSON(
 						$newAllies, 
 						array(
-							'action' => 'playerList',
+							'action' => 'playerList_toNewAllies',
 							'error' => false,
 							'allies' => User::getUsersChampionsIconsId($newAllies)
 						)
@@ -174,7 +174,32 @@ class App implements MessageComponentInterface {
 					);
 				}
 				break;
-			
+
+			case 'stopTimer':
+				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+				if($response['error'] === false){
+					$response = GameManager::getGame($user->gameId);
+					$allies = $response['game']->getUsersFromRoom($user, true);
+
+					// Response
+					Message::sendJSON(
+						$allies,
+						array(
+							'action' => 'stopTimer',
+							'error' => false,
+							'idSortGrille' => $jsonMsg['idSortGrille']
+						)
+					);
+				} else {
+					Message::send(
+						array($user),
+						$action,
+						true,
+						'Bad Request : ' . $response['message']
+					);
+				}
+				break;
+
 			default:
 				echo "[ERROR] Unsupported message format : " . $msg;
 				Message::send(
