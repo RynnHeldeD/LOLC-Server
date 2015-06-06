@@ -12,7 +12,7 @@ class App implements MessageComponentInterface {
 	protected $games;
 
     public function __construct() {
-		echo "[SERVER] Initializing... ";
+		echo "[SERVER] Initializing...\r\n";
         $this->clients = new \SplObjectStorage;
 		UserManager::init();
 		GameManager::init();
@@ -221,11 +221,11 @@ class App implements MessageComponentInterface {
 		UserManager::remove($conn);
         $this->clients->detach($conn);
 		
-        echo "[SERVER] Connection {$conn->resourceId} has disconnected\n";
+        echo "[SERVER] Connection {$conn->resourceId} has disconnected\r\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        echo "[ERROR] An error has occurred: {$e->getMessage()}\n";
+        echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
 
         $conn->close();
     }
