@@ -11,11 +11,11 @@ class Game {
 		$this->id = $gameId;
 		$this->purpleRoom = new Room($gameId, Team::$purple);
 		$this->blueRoom = new Room($gameId, Team::$blue);
-		$this->startTime = microtime();
+		$this->startTime = microtime(true);
 	}
 	
 	public function getTimestamp(){
-		return round((microtime() - $this->startTime)*1000, 0);
+		return round((microtime(true) - $this->startTime)*1000, 0);
 	}
 	
 	public function vardump(){
