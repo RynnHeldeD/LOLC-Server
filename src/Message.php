@@ -17,6 +17,7 @@ class Message {
 	public static function sendJson($users, $array){
 		foreach($users as $user){;
 			$user->getConnection()->send(json_encode($array));
+			echo "[SERVER] Sent to (".$client->getConnection->resourceId.") message : " . $msg;
 		}
 	}
 }
