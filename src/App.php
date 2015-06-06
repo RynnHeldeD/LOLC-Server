@@ -23,8 +23,7 @@ class App implements MessageComponentInterface {
         $this->clients->attach($conn);
 		UserManager::add($conn);
 		
-        echo "[SERVER] New connection! ({$conn->resourceId})\n
-        Waiting for client information (pickedChampion)\r\n";
+        echo "[SERVER] New connection! ({$conn->resourceId})\r\nWaiting for client information (pickedChampion)\r\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
