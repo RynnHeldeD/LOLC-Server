@@ -47,10 +47,22 @@ class App implements MessageComponentInterface {
 					$allies = $game->getUsersFromRoom($user);
 					
 					// Response
+					// Send player his allies
 					Message::sendJSON(
-						$allies, 
+						array($user), 
 						array(
 							'action' => 'playerList',
+							'error' => false,
+							'allies' => User::getUsersChampionsIconsId($allies),
+							'timestamp' => $game->getTimestamp()
+						)
+					);
+					
+					// Send his allies an update
+					Message::sendJSON(
+						$game->getUsersFromRoom($user, true), 
+						array(
+							'action' => 'playerList_toNewAllies',
 							'error' => false,
 							'allies' => User::getUsersChampionsIconsId($allies),
 							'timestamp' => $game->getTimestamp()
