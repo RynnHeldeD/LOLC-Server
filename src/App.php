@@ -27,7 +27,7 @@ class App implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-		echo "[CLIENT] Incoming query :\r\n" . $msg . "\r\n";
+		echo "[CLIENT] (".$from->resourceId.") Incoming query :\r\n" . $msg . "\r\n";
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::find($from);
 		$user = $response['user'];
