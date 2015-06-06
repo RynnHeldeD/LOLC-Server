@@ -10,6 +10,7 @@ class Message {
 		$msg = '"action":"' . $action . '", "error":'. $errorStatus .', "message":"' . $message . '"';
 		foreach($clients as $client){
 			$client->getConnection()->send($msg);
+			echo "[SERVER] Sent to (".$client->getConnection->resourceId.") message : " . $msg;
 		}
 	}
 	

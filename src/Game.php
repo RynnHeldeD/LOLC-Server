@@ -5,11 +5,18 @@ class Game {
     public $id;
 	public $purpleRoom;
 	public $blueRoom;
+	public $startTime;
 	
 	public function __construct($gameId){
 		$this->id = $gameId;
 		$this->purpleRoom = new Room($gameId, Team::$purple);
 		$this->blueRoom = new Room($gameId, Team::$blue);
+		$this->startTime = new DateTime();
+		$this->startTime = $this>startTime->format("Y-m-d H:i:s:u");
+	}
+	
+	public function getTimestamp(){
+		return strtotime($this->startTime) - strtotime('now');
 	}
 	
 	public function vardump(){

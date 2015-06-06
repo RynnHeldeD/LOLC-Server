@@ -52,7 +52,8 @@ class App implements MessageComponentInterface {
 						array(
 							'action' => 'playerList',
 							'error' => false,
-							'allies' => User::getUsersChampionsIconsId($allies)
+							'allies' => User::getUsersChampionsIconsId($allies),
+							'timestamp' => $game->getTimestamp()
 						)
 					);
 				} else {
