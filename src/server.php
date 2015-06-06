@@ -19,5 +19,5 @@ require ('src/App.php');
 	try {		
 		$server->run();
 	} catch(Exception $e) {
-		echo $e->getMessage();
+		echo "[ERROR] An error has occurred: {$e->getMessage()}\n";
 	}

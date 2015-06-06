@@ -221,11 +221,11 @@ class App implements MessageComponentInterface {
 		UserManager::remove($conn);
         $this->clients->detach($conn);
 		
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        echo "[SERVER] Connection {$conn->resourceId} has disconnected\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        echo "An error has occurred: {$e->getMessage()}\n";
+        echo "[ERROR] An error has occurred: {$e->getMessage()}\n";
 
         $conn->close();
     }
