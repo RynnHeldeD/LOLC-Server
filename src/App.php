@@ -12,20 +12,23 @@ class App implements MessageComponentInterface {
 	protected $games;
 
     public function __construct() {
+		echo "[SERVER] Initializing... ";
         $this->clients = new \SplObjectStorage;
 		UserManager::init();
 		GameManager::init();
+		echo "[SERVER] Done initializing.\r\n";
     }
 
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
 		UserManager::add($conn);
 		
-        echo "New connection! ({$conn->resourceId})\n";
+        echo "[SERVER] New connection! ({$conn->resourceId})\n
+        Waiting for client information (pickedChampion)\r\n";
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-		echo "\r\n[GET] " . $msg . "\r\n";
+		echo "[CLIENT] Incoming query :\r\n" . $msg . "\r\n";
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::find($from);
 		$user = $response['user'];
