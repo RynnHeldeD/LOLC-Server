@@ -16,7 +16,7 @@ class Game {
 	}
 	
 	public function getTimestamp(){
-		return strtotime($this->startTime) - strtotime('now');
+		return (strtotime('now') - strtotime($this->startTime));
 	}
 	
 	public function vardump(){
