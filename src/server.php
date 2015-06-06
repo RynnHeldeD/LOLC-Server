@@ -16,4 +16,8 @@ require ('src/App.php');
         8080
     );
 
-    $server->run();
+	try {		
+		$server->run();
+	} catch(Exception $e) {
+		echo $e->getMessage();
+	}
