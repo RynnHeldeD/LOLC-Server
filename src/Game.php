@@ -15,7 +15,7 @@ class Game {
 	}
 	
 	public function getTimestamp(){
-		return (microtime() - $this->startTime);
+		return round((microtime() - $this->startTime)*1000, 0);
 	}
 	
 	public function vardump(){
