@@ -35,7 +35,7 @@ class Room {
 	public function findChannel($passphrase){
 		$response = array('channel' => null, 'index' => null);
 		
-		foreach($room->getChannels() as $index => $ch){
+		foreach($this->getChannels() as $index => $ch){
 			if($ch->getGameId() == $this->gameId
 			&& $ch->getTeamId() == $this->teamId
 			&& $ch->getPassphrase() == $passphrase)
@@ -49,7 +49,7 @@ class Room {
 		return $response;
 	}
 	
-	public static function findOrCreateChannel($passphrase = ""){
+	public function findOrCreateChannel($passphrase = ""){
 		$response = $this->findChannel($passphrase);
 		
 		if($response['channel'] === null){

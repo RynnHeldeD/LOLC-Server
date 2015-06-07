@@ -58,7 +58,7 @@ class UserManager {
 		$championsIconsId = array();
 		
 		foreach($users as $user){
-			$championsIconsId[] = $user->championIconId;
+			$championsIconsId[] = $user->getChampionIconId();
 		}
 		
 		return $championsIconsId;

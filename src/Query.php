@@ -2,6 +2,7 @@
 namespace LoLCompanion;
 use LoLCompanion\Model\User;
 use LoLCompanion\Manager\UserManager;
+use LoLCompanion\Manager\GameManager;
 use LoLCompanion\Model\Message;
 
 class Query {
@@ -9,11 +10,12 @@ class Query {
 		// Update user information
 		$user->setGameId($jsonMsg['gameId']);
 		$user->setTeamId($jsonMsg['teamId']);
-		$user->setChampionIconId($jsonMsg['championIconId']);				
+		$user->setChampionIconId($jsonMsg['championIconId']);	
 		$user->switchToChannel($jsonMsg['passphrase']);
 		
 		// Send to the new player his allies
 		$allies = $user->findAllies();
+		$game = GameManager::findOrCreate($jsonMsg['gameId']);
 		Message::sendJSON(
 			array($user), 
 			array(
@@ -81,7 +83,7 @@ class Query {
 			array(
 				'action' => 'playerList_toOldAllies',
 				'error' => false,
-				'allies' => User::getUsersChampionsIconsId($oldAllies)
+				'allies' => UserManager::getUsersChampionsIconsId($oldAllies)
 			)
 		);
 		
@@ -93,7 +95,7 @@ class Query {
 			array(
 				'action' => 'playerList_toNewAllies',
 				'error' => false,
-				'allies' => User::getUsersChampionsIconsId($newAllies)
+				'allies' => UserManager::getUsersChampionsIconsId($newAllies)
 			),
 			true // On switch channel, we want to share timers
 		);

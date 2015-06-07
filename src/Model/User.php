@@ -1,5 +1,7 @@
 <?php
 namespace LoLCompanion\Model;
+use LoLCompanion\Manager\UserManager;
+use LoLCompanion\Manager\GameManager;
 
 class User {
     private $connection;
@@ -92,7 +94,7 @@ class User {
 		$users = $this->channel->getAllUsers();
 		
 		if(!$includeSelf){
-			for($users as $u){
+			foreach($users as $u){
 				if($u->getConnectionID() != $this->getConnectionID()){
 					$allies[] = $u;
 				}
