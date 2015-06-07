@@ -18,6 +18,6 @@ require ('src/App.php');
 
 	try {		
 		$server->run();
-	} catch(Exception $e) {
+	} catch(\Exception $e) {
 		echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
 	}

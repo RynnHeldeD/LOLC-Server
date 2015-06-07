@@ -33,7 +33,8 @@ class App implements MessageComponentInterface {
 		$user = $response['user'];
 		
 		$action = $jsonMsg['action'];
-		switch($action){
+		try {
+			switch($action){
 			case 'pickedChampion':
 				$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
 				if($response['error'] === false){
@@ -225,14 +226,20 @@ class App implements MessageComponentInterface {
 					);
 				break;
 		}
-    }
+		} catch (\Exception $e){
+			echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
+		}
+	}
 
     public function onClose(ConnectionInterface $conn) {
         // The connection is closed, remove it, as we can no longer send it messages
-		UserManager::remove($conn);
-        $this->clients->detach($conn);
-		
-        echo "[SERVER] Connection {$conn->resourceId} has disconnected\r\n";
+		try {			
+			UserManager::remove($conn);
+			$this->clients->detach($conn);			
+			echo "[SERVER] Connection {$conn->resourceId} has disconnected\r\n";
+		} catch (\Exception $e){
+			echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
+		}
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
