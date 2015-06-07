@@ -47,7 +47,7 @@ class UserManager {
 				$game = $gameResponse['game'];
 				$room = $game->getRoom($user->getTeamId());
 				$channelResponse = $room->findChannel("");
-				if($channelResponse['channel']) !== null){
+				if($channelResponse['channel'] !== null){
 					$channelResponse['channel']->removeUser($user);
 				}
 			}
