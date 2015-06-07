@@ -38,7 +38,7 @@ class UserManager {
 	public static function remove($conn){
 		$userResponse = self::findByConnection($conn);
 		
-		if($response['user'] !== null){
+		if($userResponse['user'] !== null){
 			$gameResponse = GameManager::getGame($userResponse['user']->getGameId());
 			if($gameResponse['game'] !== null){
 				$gameResponse['game']->removeUser($userResponse['user']);
