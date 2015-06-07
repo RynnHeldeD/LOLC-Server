@@ -5,6 +5,7 @@ use Ratchet\ConnectionInterface;
 use LoLCompanion\UserManager;
 use LoLCompanion\User;
 use LoLCompanion\Message;
+use LoLCompanion\Query;
 
 
 class App implements MessageComponentInterface {
@@ -29,239 +30,77 @@ class App implements MessageComponentInterface {
     public function onMessage(ConnectionInterface $from, $msg) {
 		echo "[CLIENT] (".$from->resourceId.") Incoming query :\r\n" . $msg . "\r\n";
 		$jsonMsg = Message::read($msg);
-		$response = UserManager::find($from);
-		$user = $response['user'];
-		$action = $jsonMsg['action'];
-		try {
+		$response = UserManager::findByConnection($from);
+		
+		if($response['user'] !== null) {
+			$user = $response['user'];
+			$action = $jsonMsg['action'];
 			switch($action){
-			case 'pickedChampion':
-				$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
-				if($response['error'] === false){
-					// User
-					$user->requestPickedChampion($jsonMsg['gameId'], $jsonMsg['teamId'], $jsonMsg['championIconId'], $jsonMsg['passphrase']);
-					UserManager::update($user);
-					
-					// Game
-					$game = GameManager::createIfNotExists($user->gameId);
-					$game->addUserToRoom($user, $user->teamId);
-					$allies = $game->getUsersFromRoom($user);
-					
-					// Response
-					// Send to new player his allies
-					Message::sendJSON(
-						array($user), 
-						array(
-							'action' => 'playerList',
-							'error' => false,
-							'allies' => User::getUsersChampionsIconsId($allies),
-							'timestamp' => $game->getTimestamp()
-						)
-					);
-					
-					// Send his allies an update and to one non-new ally the order to share his timers
-					if(count($allies) > 1){
-						$alliesSelfExclude = $game->getUsersFromRoom($user, true);
-						Message::sendJSON(
-							$alliesSelfExclude, 
-							array(
-								'action' => 'playerList_toNewAllies',
-								'error' => false,
-								'allies' => User::getUsersChampionsIconsId($allies)
-							),
-							true // Add the share param to one of the allies
-						);
+				case 'pickedChampion':
+					$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
+					if($response['error'] === false){
+						Query::pickedChampion($user, $jsonMsg);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
 					}
-				} else {
-					Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
-			
-			case "sentTimers":
-				$response = Tool::checkVariables($jsonMsg, array('timers', 'timestamp'));
-				if($response['error'] === false){
-					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getNewUsersFromRoom($user, true);
-					// Response
-					Message::sendJSON(
-						$allies, 
-						array(
-							'action' => 'sharedTimers',
-							'error' => false,
-							'timers' => $jsonMsg['timers'],
-							'timestamp' => $jsonMsg['timestamp']
-						)
-					);
-					var_dump("pass6");
-				} else {
-					Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
-			
-			case 'timerActivation':
-				$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
-				if($response['error'] === false){
-					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user, true);
-					
-					// Response
-					Message::sendJSON(
-						$allies, 
-						array(
-							'action' => 'timer',
-							'error' => false,
-							'idSortGrille' => $jsonMsg['idSortGrille'],
-							'timestampDeclenchement' => $jsonMsg['timestampDeclenchement']
-						)
-					);
-				} else {
-					Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
+					break;
 				
-			case 'switchChannel':
-				$response = Tool::checkVariables($jsonMsg, array('channel'));
-				if($response['error'] === false){
-					$response = GameManager::getGame($user->gameId);
-					$oldAllies = $response['game']->getUsersFromRoom($user, true);
-					Message::sendJSON(
-						$oldAllies, 
-						array(
-							'action' => 'playerList_toOldAllies',
-							'error' => false,
-							'allies' => User::getUsersChampionsIconsId($oldAllies)
-						)
-					);
-					
-					$user->passphrase = $jsonMsg['channel'];
-					UserManager::update($user);
-					$newAllies = $response['game']->getUsersFromRoom($user);
-					
-					Message::sendJSON(
-						$newAllies, 
-						array(
-							'action' => 'playerList_toNewAllies',
-							'error' => false,
-							'allies' => User::getUsersChampionsIconsId($newAllies)
-						)
-					);
-				} else {
-					Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
+				case "sentTimers":
+					$response = Tool::checkVariables($jsonMsg, array('timers', 'timestamp'));
+					if($response['error'] === false){
+						Query::sentTimers($user);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
+					}
+					break;
 				
-			case 'timerDelay':
-				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
-				if($response['error'] === false){
-					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user, true);
-					
-					// Response
-					Message::sendJSON(
-						$allies, 
-						array(
-							'action' => 'timerDelay',
-							'error' => false,
-							'idSortGrille' => $jsonMsg['idSortGrille']
-						)
-					);
-				} else {
-					Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
+				case 'timerActivation':
+					$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
+					if($response['error'] === false){
+						Query::timerActivation($user, $jsonMsg);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
+					}
+					break;
 				
-			case 'razTimer':
-				$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
-				if($response['error'] === false){
-					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user, true);
+				case 'switchChannel':
+					$response = Tool::checkVariables($jsonMsg, array('channel'));
+					if($response['error'] === false){
+						Query::switchChannel($user, $jsonMsg);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
+					}
+					break;
 					
-					// Response
-					Message::sendJSON(
-						$allies, 
-						array(
-							'action' => 'razTimer',
-							'error' => false,
-							'idSortGrille' => $jsonMsg['idSortGrille'],
-							'timestampDeclenchement' => $jsonMsg['timestampDeclenchement']
-						)
-					);
-				} else {
-					Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
+				case 'timerDelay':
+					$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+					if($response['error'] === false){
+						Query::timerDelay($user, $jsonMsg);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
+					}
+					break;
+					
+				case 'stopTimer':
+					$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+					if($response['error'] === false){
+						Query::stopTimer($user, $jsonMsg);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
+					}
+					break;
 
-			case 'stopTimer':
-				$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
-				if($response['error'] === false){
-					$response = GameManager::getGame($user->gameId);
-					$allies = $response['game']->getUsersFromRoom($user, true);
-
-					// Response
-					Message::sendJSON(
-						$allies,
-						array(
-							'action' => 'stopTimer',
-							'error' => false,
-							'idSortGrille' => $jsonMsg['idSortGrille']
-						)
-					);
-				} else {
-					Message::send(
-						array($user),
-						$action,
-						true,
-						'Bad Request : ' . $response['message']
-					);
-				}
-				break;
-
-			default:
-				echo "[ERROR] Unsupported message format : " . $msg;
-				Message::send(
-						array($user), 
-						$action,
-						true,
-						'Bad Request : Unsupported message format : ' . $msg
-					);
-				break;
-		}
-		} catch (\Exception $e){
-			echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
+				default:
+					echo "[ERROR] Unsupported message format : " . $msg;
+					Message::sendErrorMessage(array($user), $action, $response['message']);
+					break;
+			}
+		} else {
+			echo "[ERROR] user is null\r\n";
 		}
 	}
 
     public function onClose(ConnectionInterface $conn) {
-        // The connection is closed, remove it, as we can no longer send it messages
 		try {			
 			UserManager::remove($conn);
 			$this->clients->detach($conn);			

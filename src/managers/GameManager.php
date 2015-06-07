@@ -9,7 +9,7 @@ class GameManager {
 		self::$games = array();
 	}
 	
-	public static function createIfNotExists($gameId){
+	public static function findOrCreate($gameId){
 		$response = self::getGame($gameId);
 		$game = null;
 		
