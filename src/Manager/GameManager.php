@@ -1,6 +1,6 @@
 <?php
-namespace LoLCompanion;
-use LoLCompanion\Game;
+namespace LoLCompanion\Manager;
+use LoLCompanion\Model\Game;
 
 class GameManager {
     public static $games;

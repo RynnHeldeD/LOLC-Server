@@ -1,5 +1,5 @@
 <?php
-namespace LoLCompanion;
+namespace LoLCompanion\Model;
 
 class Room {
     private $gameId;

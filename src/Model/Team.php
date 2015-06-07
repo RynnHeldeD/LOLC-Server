@@ -1,5 +1,5 @@
 <?php
-namespace LoLCompanion;
+namespace LoLCompanion\Model;
 
 class Team {
     public static $blue = 100;

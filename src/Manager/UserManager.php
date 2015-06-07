@@ -1,6 +1,6 @@
 <?php
-namespace LoLCompanion;
-use LoLCompanion\User;
+namespace LoLCompanion\Manager;
+use LoLCompanion\Model\User;
 
 class UserManager {
     public static $users;

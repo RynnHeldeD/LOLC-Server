@@ -1,8 +1,8 @@
 <?php
 namespace LoLCompanion;
-use LoLCompanion\User;
-use LoLCompanion\UserManager;
-use LoLCompanion\Message;
+use LoLCompanion\Model\User;
+use LoLCompanion\Manager\UserManager;
+use LoLCompanion\Model\Message;
 
 class Query {
 	public static function pickedChampion($user, $jsonMsg){

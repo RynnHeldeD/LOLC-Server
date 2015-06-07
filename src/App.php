@@ -2,10 +2,11 @@
 namespace LoLCompanion;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use LoLCompanion\UserManager;
-use LoLCompanion\User;
-use LoLCompanion\Message;
-use LoLCompanion\Query;
+use LoLCompanion\Manager\UserManager;
+use LoLCompanion\Manager\GameManager;
+use LoLCompanion\Model\User;
+use LoLCompanion\Model\Message;
+use LoLCompanion\Model\Query;
 
 
 class App implements MessageComponentInterface {
