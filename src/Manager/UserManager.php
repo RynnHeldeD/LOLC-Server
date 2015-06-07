@@ -39,9 +39,17 @@ class UserManager {
 		$userResponse = self::findByConnection($conn);
 		
 		if($userResponse['user'] !== null){
-			$gameResponse = GameManager::getGame($userResponse['user']->getGameId());
+			$user = $userResponse['user'];
+			$user->switchToChannel("");
+
+			$gameResponse = GameManager::getGame($user->getGameId());
 			if($gameResponse['game'] !== null){
-				$gameResponse['game']->removeUser($userResponse['user']);
+				$game = $gameResponse['game'];
+				$room = $game->getRoom($user->getTeamId());
+				$channelResponse = $room->findChannel("");
+				if($channelResponse['channel']) !== null){
+					$channelResponse['channel']->removeUser($user);
+				}
 			}
 		}
 	}
