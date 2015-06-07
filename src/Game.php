@@ -88,7 +88,7 @@ class Game {
 	}
 	
 	public function getNewUsersFromRoom($user, $selfExclude = false){
-		$users = $this->getNewUsersFromRoom($user, $selfExclude);
+		$users = $this->getUsersFromRoom($user, $selfExclude);
 		$newUsers = array();
 		
 		foreach($users as $u){

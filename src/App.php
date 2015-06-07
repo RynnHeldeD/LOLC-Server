@@ -31,7 +31,6 @@ class App implements MessageComponentInterface {
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::find($from);
 		$user = $response['user'];
-		
 		$action = $jsonMsg['action'];
 		try {
 			switch($action){
@@ -60,28 +59,18 @@ class App implements MessageComponentInterface {
 					);
 					
 					// Send his allies an update and to one non-new ally the order to share his timers
-					$allies = $game->getUsersFromRoom($user, true);
-					$oldAlly = UserManager::getANonNewUser($allies);
-					$allies = $game->getUsersFromRoom($oldAlly, true);
-					Message::sendJSON(
-						$allies, 
-						array(
-							'action' => 'playerList_toNewAllies',
-							'error' => false,
-							'allies' => User::getUsersChampionsIconsId($allies)
-						)
-					);
-					
-					Message::sendJSON(
-						$allies, 
-						array(
-							'action' => 'playerList_toNewAllies',
-							'error' => false,
-							'allies' => User::getUsersChampionsIconsId($allies),
-							'share' => true
-						)
-					);					
-					
+					if(count($allies) > 1){
+						$alliesSelfExclude = $game->getUsersFromRoom($user, true);
+						Message::sendJSON(
+							$alliesSelfExclude, 
+							array(
+								'action' => 'playerList_toNewAllies',
+								'error' => false,
+								'allies' => User::getUsersChampionsIconsId($allies)
+							),
+							true // Add the share param to one of the allies
+						);
+					}
 				} else {
 					Message::send(
 						array($user), 
@@ -97,7 +86,6 @@ class App implements MessageComponentInterface {
 				if($response['error'] === false){
 					$response = GameManager::getGame($user->gameId);
 					$allies = $response['game']->getNewUsersFromRoom($user, true);
-					
 					// Response
 					Message::sendJSON(
 						$allies, 
@@ -108,6 +96,7 @@ class App implements MessageComponentInterface {
 							'timestamp' => $jsonMsg['timestamp']
 						)
 					);
+					var_dump("pass6");
 				} else {
 					Message::send(
 						array($user), 
