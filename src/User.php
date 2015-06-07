@@ -7,6 +7,7 @@ class User {
 	public $teamId;
 	public $championIconId;
 	public $passphrase;
+	public $isNewInRoom;
 	
 	public function __construct($conn){
 		$this->connection = $conn;
@@ -14,6 +15,7 @@ class User {
 		$this->teamId = -1;
 		$this->championIconId = -1;
 		$this->passphrase = '';
+		$this->isNewInRoom = false;
 	}
 	
 	public function getConnectionID(){

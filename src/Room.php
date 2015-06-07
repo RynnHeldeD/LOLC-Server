@@ -13,15 +13,21 @@ class Room {
 	}
 	
 	public function addUser($user){
-		$response = self::getUser($user);
-		
-		if($response['user'] === null){
+		if(count($this->users) == 0){
+			$user->isNewInRoom = false;
 			array_push($this->users, $user);
+		} else {
+			$response = $this->getUser($user);
+			
+			if($response['user'] === null){
+				$user->isNewInRoom = true;
+				array_push($this->users, $user);
+			}
 		}
 	}
 	
 	public function removeUser($user){
-		$response = self::getUser($user);
+		$response = $this->getUser($user);
 		
 		if($response['user'] !== null && $response['index'] !== null){
 			unset($this->users[$response['index']]);

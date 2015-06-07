@@ -86,4 +86,17 @@ class Game {
 		
 		return $users;
 	}
+	
+	public function getNewUsersFromRoom($user, $selfExclude = false){
+		$users = $this->getNewUsersFromRoom($user, $selfExclude);
+		$newUsers = array();
+		
+		foreach($users as $u){
+			if($u->isNewInRoom){
+				$newUsers[] = $u;
+			}
+		}
+		
+		return $newUsers;
+	}
 }

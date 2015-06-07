@@ -50,4 +50,17 @@ class UserManager {
 			echo "[". $user->getConnectionID() . "] " . $user->nickname;
 		}
 	}
+	
+	public static function getANonNewUser($users){
+		$user = null;
+		
+		foreach($users as $u){
+			if(!$u->isNewInRoom){
+				$user = $u;
+				break;
+			}
+		}
+		
+		return $user;
+	}
 }

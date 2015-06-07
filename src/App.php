@@ -48,7 +48,7 @@ class App implements MessageComponentInterface {
 					$allies = $game->getUsersFromRoom($user);
 					
 					// Response
-					// Send player his allies
+					// Send to new player his allies
 					Message::sendJSON(
 						array($user), 
 						array(
@@ -59,13 +59,53 @@ class App implements MessageComponentInterface {
 						)
 					);
 					
-					// Send his allies an update
+					// Send his allies an update and to one non-new ally the order to share his timers
+					$allies = $game->getUsersFromRoom($user, true)
+					$oldAlly = UserManager::getANonNewUser($allies);
+					$allies = $game->getUsersFromRoom($oldAlly, true)
 					Message::sendJSON(
-						$game->getUsersFromRoom($user, true), 
+						$allies, 
 						array(
 							'action' => 'playerList_toNewAllies',
 							'error' => false,
 							'allies' => User::getUsersChampionsIconsId($allies)
+						)
+					);
+					
+					Message::sendJSON(
+						$allies, 
+						array(
+							'action' => 'playerList_toNewAllies',
+							'error' => false,
+							'allies' => User::getUsersChampionsIconsId($allies),
+							'share' => true
+						)
+					);					
+					
+				} else {
+					Message::send(
+						array($user), 
+						$action,
+						true,
+						'Bad Request : ' . $response['message']
+					);
+				}
+				break;
+			
+			case "sentTimers":
+				$response = Tool::checkVariables($jsonMsg, array('timers', 'timestamp'));
+				if($response['error'] === false){
+					$response = GameManager::getGame($user->gameId);
+					$allies = $response['game']->getNewUsersFromRoom($user, true);
+					
+					// Response
+					Message::sendJSON(
+						$allies, 
+						array(
+							'action' => 'sharedTimers',
+							'error' => false,
+							'timers' => $jsonMsg['timers'],
+							'timestamp' => $jsonMsg['timestamp']
 						)
 					);
 				} else {
