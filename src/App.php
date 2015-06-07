@@ -60,7 +60,7 @@ class App implements MessageComponentInterface {
 					);
 					
 					// Send his allies an update and to one non-new ally the order to share his timers
-					$allies = $game->getUsersFromRoom($user, true)
+					$allies = $game->getUsersFromRoom($user, true);
 					$oldAlly = UserManager::getANonNewUser($allies);
 					$allies = $game->getUsersFromRoom($oldAlly, true)
 					Message::sendJSON(
