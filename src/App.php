@@ -34,7 +34,7 @@ class App implements MessageComponentInterface {
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::findByConnection($from);
 		
-		if($response['user'] !== null) {
+		if($response['user'] !== null && $response['user']->isReady()) {
 			$user = $response['user'];
 			$action = $jsonMsg['action'];
 			switch($action){
@@ -98,7 +98,7 @@ class App implements MessageComponentInterface {
 					break;
 			}
 		} else {
-			echo "[ERROR] user is null\r\n";
+			echo "[ERROR] User is null or not ready (no pickedChampion ?)\r\n";
 		}
 	}
 

@@ -76,6 +76,12 @@ class User {
 	/**
 	* FUNCTIONS
 	*/
+	public function isReady(){
+		return ($this->gameId != -1
+		&& $this->teamId != -1
+		&& $this->championIconId != -1);
+	}
+	
 	public function switchToChannel($passphrase){
 		if($this->channel != null){
 			$this->channel->removeUser($this);
