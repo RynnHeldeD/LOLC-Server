@@ -79,7 +79,8 @@ class User {
 	public function isReady(){
 		return ($this->gameId != -1
 		&& $this->teamId != -1
-		&& $this->championIconId != -1);
+		&& $this->championIconId != -1
+		&& $this->channel != null);
 	}
 	
 	public function switchToChannel($passphrase){
