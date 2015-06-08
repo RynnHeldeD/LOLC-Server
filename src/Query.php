@@ -41,7 +41,7 @@ class Query {
 		}
 	}
 	
-	public static function sentTimers($user){
+	public static function sentTimers($user, $jsonMsg){
 		$allies = $user->findAllies(false);
 		$newAllies = array();
 		

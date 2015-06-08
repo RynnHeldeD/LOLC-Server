@@ -50,7 +50,7 @@ class App implements MessageComponentInterface {
 				case "sentTimers":
 					$response = Tool::checkVariables($jsonMsg, array('timers', 'timestamp'));
 					if($response['error'] === false){
-						Query::sentTimers($user);
+						Query::sentTimers($user, $jsonMsg);
 					} else {
 						Message::sendErrorMessage(array($user), $action, $response['message']);
 					}
