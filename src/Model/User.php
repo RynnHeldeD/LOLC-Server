@@ -99,16 +99,20 @@ class User {
 	public function findAllies($includeSelf = true){
 		$allies = array();
 		$users = $this->channel->getAllUsers();
-		if(!$includeSelf){
-			foreach($users as $u){
-				if($u->getConnectionID() != $this->getConnectionID()){
-					$allies[] = $u;
+		if($this->channel->getPassphrase() != ''){
+			if(!$includeSelf){
+				foreach($users as $u){
+					if($u->getConnectionID() != $this->getConnectionID()){
+						$allies[] = $u;
+					}
 				}
+			} else {
+				$allies = $users;
 			}
 		} else {
-			$allies = $users;
+			$allies[] = $this;
 		}
-		
+				
 		return $allies;
 	}
 }
