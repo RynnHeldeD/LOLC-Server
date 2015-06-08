@@ -114,7 +114,8 @@ class App implements MessageComponentInterface {
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
         echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
-
+		UserManager::remove($conn);
+		$this->clients->detach($conn);			
         $conn->close();
     }
 }

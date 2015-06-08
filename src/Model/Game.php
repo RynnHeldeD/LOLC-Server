@@ -2,16 +2,20 @@
 namespace LoLCompanion\Model;
 
 class Game {
-    public $id;
-	public $purpleRoom;
-	public $blueRoom;
-	public $startTime;
+    private $id;
+	private $purpleRoom;
+	private $blueRoom;
+	private $startTime;
 	
 	public function __construct($gameId){
 		$this->id = $gameId;
 		$this->purpleRoom = new Room($gameId, Team::$purple);
 		$this->blueRoom = new Room($gameId, Team::$blue);
 		$this->startTime = microtime(true);
+	}
+	
+	public function getId(){
+		return $this->id;
 	}
 	
 	public function getTimestamp(){

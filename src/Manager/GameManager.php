@@ -27,7 +27,7 @@ class GameManager {
 		$response = array('game' => null, 'index' => null);
 		
 		foreach(self::$games as $index => $game){
-			if($game->id === $gameId){
+			if($game->getId() === $gameId){
 				$response['game'] = $game;
 				$response['index'] = $index;
 				break;

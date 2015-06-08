@@ -1,6 +1,7 @@
 <?php
 namespace LoLCompanion\Manager;
 use LoLCompanion\Model\User;
+use LoLCompanion\Query;
 
 class UserManager {
     public static $users;
@@ -40,8 +41,7 @@ class UserManager {
 		
 		if($userResponse['user'] !== null){
 			$user = $userResponse['user'];
-			$user->switchToChannel("");
-
+			Query::switchChannel($user, array('channel' => ''));
 			$gameResponse = GameManager::getGame($user->getGameId());
 			if($gameResponse['game'] !== null){
 				$game = $gameResponse['game'];
@@ -51,6 +51,8 @@ class UserManager {
 					$channelResponse['channel']->removeUser($user);
 				}
 			}
+			unset(self::$users[$userResponse['index']]);
+			self::$users = array_values(self::$users);
 		}
 	}
 	
@@ -66,7 +68,9 @@ class UserManager {
 		$championsIconsId = array();
 		
 		foreach($users as $user){
-			$championsIconsId[] = $user->getChampionIconId();
+			if(!in_array($user->getChampionIconId(), $championsIconsId)){
+				$championsIconsId[] = $user->getChampionIconId();
+			}
 		}
 		
 		return $championsIconsId;
