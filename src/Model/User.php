@@ -1,5 +1,6 @@
 <?php
 namespace LoLCompanion\Model;
+use LoLCompanion\Model\Channel;
 use LoLCompanion\Manager\UserManager;
 use LoLCompanion\Manager\GameManager;
 
@@ -80,11 +81,12 @@ class User {
 		return ($this->gameId != -1
 		&& $this->teamId != -1
 		&& $this->championIconId != -1
-		&& $this->channel != null);
+		&& $this->channel != null
+		&& $this->channel instanceOf Channel);
 	}
 	
 	public function switchToChannel($passphrase){
-		if($this->channel != null){
+		if($this->channel != null && $this->channel instanceOf Channel){
 			$this->channel->removeUser($this);
 		}
 		
@@ -93,29 +95,31 @@ class User {
 		$channel = $room->addUserToChannel($this, $passphrase);
 		$this->channel = $channel;
 		
-		//UserManager::update($this);
+		UserManager::update($this);
 	}
 	
 	public function findAllies($includeSelf = true){
 		$allies = array();
 		
-		var_dump($this->getConnectionID());
-		var_dump(is_null($this->channel));
-		var_dump($this->channel->getPassphrase());
-		
-		$users = $this->channel->getAllUsers();
-		if($this->channel->getPassphrase() != ''){
-			if(!$includeSelf){
-				foreach($users as $u){
-					if($u->getConnectionID() != $this->getConnectionID()){
-						$allies[] = $u;
+		if($this->channel != null && $this->channel instanceOf Channel){
+			$users = $this->channel->getAllUsers();
+			if($this->channel->getPassphrase() != ''){
+				if(!$includeSelf){
+					foreach($users as $u){
+						if($u->getConnectionID() != $this->getConnectionID()){
+							$allies[] = $u;
+						}
 					}
+				} else {
+					$allies = $users;
 				}
 			} else {
-				$allies = $users;
+				$allies[] = $this;
 			}
 		} else {
-			$allies[] = $this;
+			echo "[ERROR] FindAllies called on (" . $this->getConnectionID() . ") but his channel is not set : \r\n" . 
+			"is_null: " . is_null($this->channel) . "\r\n
+			instanceOf channel: " . ($this->channel instanceOf Channel) . "\r\n";
 		}
 				
 		return $allies;
