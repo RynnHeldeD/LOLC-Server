@@ -15,12 +15,16 @@ class Message {
 	}
 	
 	public static function sendJson($users, $params, $addShareParam = false){
-		if($addShareParam){
-			$shared = false;
-		}
+		$shared = false;
 		
 		foreach($users as $user){
-			if($addShareParam && !$shared && !$user->isNewInRoom){
+			if($addShareParam && $shared){
+				if(isset($params['share'])){
+					unset($params['share']);
+				}
+			}
+			
+			if($addShareParam && !$shared && !$user->isNewInChannel()){
 				$params['share'] = true;
 				$shared = true;
 			}

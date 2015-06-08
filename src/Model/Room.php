@@ -66,6 +66,11 @@ class Room {
 		$response = $this->findOrCreateChannel($passphrase);
 		
 		if($response['channel'] !== null){
+			if(count($response['channel']->getAllUsers()) > 0){
+				$user->setIsNewInChannel(true);
+				} else {
+				$user->setIsNewInChannel(false);;
+			}
 			$response['channel']->addUser($user);
 		}
 		

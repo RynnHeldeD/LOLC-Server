@@ -46,7 +46,9 @@ class Query {
 		$newAllies = array();
 		
 		foreach($allies as $a){
-			if($a->isNewInRoom){
+			if($a->isNewInChannel()){
+				$a->setIsNewInChannel(false);
+				UserManager::update($a);
 				$newAllies[] = $a;
 			}
 		}

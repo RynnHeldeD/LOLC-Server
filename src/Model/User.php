@@ -92,7 +92,6 @@ class User {
 	public function findAllies($includeSelf = true){
 		$allies = array();
 		$users = $this->channel->getAllUsers();
-		
 		if(!$includeSelf){
 			foreach($users as $u){
 				if($u->getConnectionID() != $this->getConnectionID()){
