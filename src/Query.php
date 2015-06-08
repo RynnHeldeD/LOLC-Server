@@ -128,5 +128,19 @@ class Query {
 			)
 		);
 	}
+	
+	public static function sentCooldown($user, $jsonMsg){
+		$allies = $user->findAllies(false);
+
+		Message::sendJSON(
+			$allies,
+			array(
+				'action' => 'sharedCooldown',
+				'error' => false,
+				'champUlti' => $jsonMsg['champUlti'],
+				'cdr' => $jsonMsg['cdr']
+			)
+		);
+	}
 }
 ?>

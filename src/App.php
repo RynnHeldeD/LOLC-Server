@@ -91,6 +91,15 @@ class App implements MessageComponentInterface {
 						Message::sendErrorMessage(array($user), $action, $response['message']);
 					}
 					break;
+					
+				case 'sentCooldown':
+					$response = Tool::checkVariables($jsonMsg, array('champUlti', 'cdr'));
+					if($response['error'] === false){
+						Query::sentCooldown($user, $jsonMsg);
+					} else {
+						Message::sendErrorMessage(array($user), $action, $response['message']);
+					}
+					break;
 
 				default:
 					echo "[ERROR] Unsupported message format : " . $msg;
