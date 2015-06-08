@@ -107,6 +107,7 @@ class App implements MessageComponentInterface {
 			UserManager::remove($conn);
 			$this->clients->detach($conn);			
 			echo "[SERVER] Connection {$conn->resourceId} has disconnected\r\n";
+			GameManager::cleanGames();
 		} catch (\Exception $e){
 			echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
 		}

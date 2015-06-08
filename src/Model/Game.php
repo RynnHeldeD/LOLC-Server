@@ -21,6 +21,10 @@ class Game {
 	public function getTimestamp(){
 		return round((microtime(true) - $this->startTime)*1000, 0);
 	}
+	
+	public function getStartTime(){
+		return $this->startTime;
+	}
 		
 	public function getRoom($teamId){
 		$room = null;
