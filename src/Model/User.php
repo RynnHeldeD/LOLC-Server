@@ -98,6 +98,11 @@ class User {
 	
 	public function findAllies($includeSelf = true){
 		$allies = array();
+		
+		var_dump($this->getConnectionID());
+		var_dump(is_null($this->channel));
+		var_dump($this->channel->getPassphrase());
+		
 		$users = $this->channel->getAllUsers();
 		if($this->channel->getPassphrase() != ''){
 			if(!$includeSelf){
