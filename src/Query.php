@@ -14,30 +14,34 @@ class Query {
 		$user->switchToChannel($jsonMsg['passphrase']);
 		
 		// Send to the new player his allies
-		$allies = $user->findAllies();
-		$game = GameManager::findOrCreate($jsonMsg['gameId']);
-		Message::sendJSON(
-			array($user), 
-			array(
-				'action' => 'playerList',
-				'error' => false,
-				'allies' => UserManager::getUsersChampionsIconsId($allies),
-				'timestamp' => $game->getTimestamp()
-			)
-		);
-		
-		// Send his allies an update and to one of them but non non-new a request to share his timers
-		if(count($allies) > 0){
-			$alliesExceptSelf = $user->findAllies(false);
+		if($user->isReady()){
+			$allies = $user->findAllies();
+			$game = GameManager::findOrCreate($jsonMsg['gameId']);
 			Message::sendJSON(
-				$alliesExceptSelf, 
+				array($user), 
 				array(
-					'action' => 'playerList_toNewAllies',
+					'action' => 'playerList',
 					'error' => false,
-					'allies' => UserManager::getUsersChampionsIconsId($allies)
-				),
-				true // Add the share param to one of the allies
+					'allies' => UserManager::getUsersChampionsIconsId($allies),
+					'timestamp' => $game->getTimestamp()
+				)
 			);
+			
+			// Send his allies an update and to one of them but non non-new a request to share his timers
+			if(count($allies) > 0){
+				$alliesExceptSelf = $user->findAllies(false);
+				Message::sendJSON(
+					$alliesExceptSelf, 
+					array(
+						'action' => 'playerList_toNewAllies',
+						'error' => false,
+						'allies' => UserManager::getUsersChampionsIconsId($allies)
+					),
+					true // Add the share param to one of the allies
+				);
+			}
+		} else {
+			echo "[ERROR] PickedChampion called on " . $user->getConnectionId() . " but user is not ready after set. Is the jsonMsg correct ?\r\n " . var_dump($jsonMsg);
 		}
 	}
 	
