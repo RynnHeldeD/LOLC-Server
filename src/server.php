@@ -5,6 +5,7 @@ use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
 use LoLCompanion\App;
+use LoLCompanion\Model\Tool;
 require ('src/App.php');
 
     $server = IoServer::factory(
@@ -19,5 +20,5 @@ require ('src/App.php');
 	try {		
 		$server->run();
 	} catch(\Exception $e) {
-		echo "[ERROR] An error has occurred: {$e->getMessage()}\r\n";
+		Tool::log('An error has occurred: {' . $e->getMessage() . '}', 'fatal');
 	}

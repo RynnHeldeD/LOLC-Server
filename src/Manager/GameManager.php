@@ -1,6 +1,7 @@
 <?php
 namespace LoLCompanion\Manager;
 use LoLCompanion\Model\Game;
+use LoLCompanion\Model\Tool;
 
 class GameManager {
     public static $games;
@@ -41,10 +42,11 @@ class GameManager {
 	
 	public static function cleanGames(){
 		$now = microtime(true);
-		echo "[SERVER] ".count(self::$games)." games running.\r\n";
-		echo "[SERVER] Last clean was ". date('Y-m-d H:i:s', self::$lastCleanDate) ."\r\n";
+		Tool::log(count(self::$games)." games running.");
+		Tool::log("Last clean was ". date('Y-m-d H:i:s', self::$lastCleanDate));
+		
 		if(round(($now - self::$lastCleanDate), 0) > 3600){
-			echo "[SERVER] Running game cleaner.\r\n";
+			Tool::log("Running game cleaner.");
 			self::$lastCleanDate = $now;
 			$gamesToClean = array();
 			foreach(self::$games as $index => $game){
@@ -54,14 +56,14 @@ class GameManager {
 			}
 			
 			if(!empty($gamesToClean)){
-				echo "[SERVER] Cleaning " . count($gamesToClean) . " games.\r\n";
+				Tool::log("Cleaning " . count($gamesToClean) . " games.");
 				foreach($gamesToClean as $index){
 					unset(self::$games[$index]);
 				}
 				self::$games = array_values(self::$games);
-				echo "[SERVER] ".count(self::$games)." games running.\r\n";
+				Tool::log(count(self::$games)." games running.");
 			} else {
-				echo "[SERVER] No game to clean.\r\n";
+				Tool::log("No game to clean.");
 			}
 		}
 	}

@@ -42,7 +42,7 @@ class Channel {
 		$response = array('user' => null, 'index' => null);
 		
 		foreach($this->users as $index => $u){
-			if($u->getConnectionId() == $user->getConnectionId()){
+			if($u->getConnectionID() == $user->getConnectionID()){
 				$response['user'] = $u;
 				$response['index'] = $index;
 				break;

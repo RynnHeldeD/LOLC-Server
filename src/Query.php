@@ -4,6 +4,7 @@ use LoLCompanion\Model\User;
 use LoLCompanion\Manager\UserManager;
 use LoLCompanion\Manager\GameManager;
 use LoLCompanion\Model\Message;
+use LoLCompanion\Model\Tool;
 
 class Query {
 	public static function pickedChampion($user, $jsonMsg){
@@ -40,8 +41,18 @@ class Query {
 					true // Add the share param to one of the allies
 				);
 			}
+			
+			UserManager::addAuthenticatedUser($user);
 		} else {
-			echo "[ERROR] PickedChampion called on " . $user->getConnectionId() . " but user is not ready after set. Is the jsonMsg correct ?\r\n " . var_dump($jsonMsg);
+			Tool::log("PickedChampion called on " . $user->getConnectionID() . " but user is not ready after set. Is the jsonMsg correct ?\r\n" . var_dump($jsonMsg) . "\r\n
+			Requesting champion.", 'error');
+			Message::sendJSON(
+				$user, 
+				array(
+					'action' => 'requestChampion',
+					'error' => false,
+				)
+			);
 		}
 	}
 	
@@ -83,28 +94,39 @@ class Query {
 	}
 	
 	public static function switchChannel($user, $jsonMsg){
-		$oldAllies = $user->findAllies(false);
-		Message::sendJSON(
-			$oldAllies, 
-			array(
-				'action' => 'playerList_toOldAllies',
-				'error' => false,
-				'allies' => UserManager::getUsersChampionsIconsId($oldAllies)
-			)
-		);
-		
-		$user->switchToChannel($jsonMsg['channel']);
+		if($user->isReady()){
+			$oldAllies = $user->findAllies(false);
+			Message::sendJSON(
+				$oldAllies, 
+				array(
+					'action' => 'playerList_toOldAllies',
+					'error' => false,
+					'allies' => UserManager::getUsersChampionsIconsId($oldAllies)
+				)
+			);
+			
+			$user->switchToChannel($jsonMsg['channel']);
 
-		$newAllies = $user->findAllies();
-		Message::sendJSON(
-			$newAllies, 
-			array(
-				'action' => 'playerList_toNewAllies',
-				'error' => false,
-				'allies' => UserManager::getUsersChampionsIconsId($newAllies)
-			),
-			true // On switch channel, we want to share timers
-		);
+			$newAllies = $user->findAllies();
+			Message::sendJSON(
+				$newAllies, 
+				array(
+					'action' => 'playerList_toNewAllies',
+					'error' => false,
+					'allies' => UserManager::getUsersChampionsIconsId($newAllies)
+				),
+				true // On switch channel, we want to share timers
+			);
+		} else {
+			Tool::log('Trying to switch channel on a non ready user. Requesting champion.', 'error');
+			Message::sendJSON(
+				$user, 
+				array(
+					'action' => 'requestChampion',
+					'error' => false,
+				)
+			);
+		}
 	}
 	
 	public static function timerDelay($user, $jsonMsg){		
@@ -143,6 +165,20 @@ class Query {
 				'error' => false,
 				'champUlti' => $jsonMsg['champUlti'],
 				'cdr' => $jsonMsg['cdr']
+			)
+		);
+	}
+	
+	public static function shareUltimateLevel($user, $jsonMsg){
+		$allies = $user->findAllies(false);
+
+		Message::sendJSON(
+			$allies,
+			array(
+				'action' => 'sharedUltimateLevel',
+				'error' => false,
+				'buttonId' => $jsonMsg['buttonId'],
+				'ultiLevel' => $jsonMsg['ultiLevel']
 			)
 		);
 	}

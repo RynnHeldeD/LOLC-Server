@@ -18,4 +18,8 @@ class Tool {
 		
 		return $response;
 	}
+	
+	public static function log($message, $origin = "server" ){
+		echo '['.date('Y-m-d-H:i:s') . '] ' . "[" . strtoupper($origin) . "] " . $message . "\r\n";
+	}
 }

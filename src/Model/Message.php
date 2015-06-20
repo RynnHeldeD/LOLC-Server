@@ -1,6 +1,8 @@
 <?php
 namespace LoLCompanion\Model;
 
+use LoLCompanion\Model\Tool;
+
 class Message {
 	public static function read($jsonMsg){
 		return json_decode($jsonMsg, true);
@@ -10,7 +12,7 @@ class Message {
 		$msg = '"action":"' . $action . '", "error":'. $errorStatus .', "message":"' . $message . '"';
 		foreach($clients as $client){
 			$client->getConnection()->send($msg);
-			echo "[SERVER] Sent to (".$client->getConnection()->resourceId.") message : " . $msg . "\r\n";
+			Tool::log("On $action : Sent :" . $message, 'server to ('. $client->getConnectionID() .')');
 		}
 	}
 	
@@ -29,7 +31,7 @@ class Message {
 				$shared = true;
 			}
 			$user->getConnection()->send(json_encode($params));
-			echo "[SERVER] Sent to (".$user->getConnection()->resourceId.") message : " . json_encode($params) ."\r\n";
+			Tool::log("On " .$params['action'] . " : Sent :" . json_encode($params), 'server to ('. $user->getConnectionID() .')');
 		}
 	}
 	
@@ -37,7 +39,7 @@ class Message {
 		$msg = '"action":"' . $action . '", "error":true, "message":"' . $message . '"';
 		foreach($users as $user){
 			$user->getConnection()->send($msg);
-			echo "[SERVER] Sent to (".$user->getConnection()->resourceId.") message : " . $msg . "\r\n";
+			Tool::log("Error on $action : Sent " . $response['message'], 'server to ('. $user->getConnectionID() .')');
 		}
 	}
 }

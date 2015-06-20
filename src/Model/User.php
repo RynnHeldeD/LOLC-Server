@@ -3,6 +3,7 @@ namespace LoLCompanion\Model;
 use LoLCompanion\Model\Channel;
 use LoLCompanion\Manager\UserManager;
 use LoLCompanion\Manager\GameManager;
+use LoLCompanion\Model\Tool;
 
 class User {
     private $connection;
@@ -117,9 +118,14 @@ class User {
 				$allies[] = $this;
 			}
 		} else {
-			echo "[ERROR] FindAllies called on (" . $this->getConnectionID() . ") but his channel is not set : \r\n" . 
-			"is_null: " . is_null($this->channel) . "\r\n
-			instanceOf channel: " . ($this->channel instanceOf Channel) . "\r\n";
+			Tool::log("FindAllies called on (" . $this->getConnectionID() . ") but his channel is not set. Querying pickedChampion.", 'error');
+			Message::sendJSON(
+				$this, 
+				array(
+					'action' => 'requestChampion',
+					'error' => false,
+				)
+			);
 		}
 				
 		return $allies;

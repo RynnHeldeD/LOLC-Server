@@ -2,12 +2,15 @@
 namespace LoLCompanion\Manager;
 use LoLCompanion\Model\User;
 use LoLCompanion\Query;
+use LoLCompanion\Model\Tool;
 
 class UserManager {
     public static $users;
+    public static $pendingUsers;
 	
 	public static function init(){
 		self::$users = array();
+		self::$pendingUsers = array();
 	}
 	
 	public static function findByConnection($conn){
@@ -27,12 +30,40 @@ class UserManager {
 		return $response;
 	}
 	
-	public static function add($conn){
-		$response = self::findByConnection($conn);
+	public static function findPendingUser($userConn){
+		$response = array(
+			'user' => null,
+			'index' => -1,
+		);
+		
+		foreach(self::$pendingUsers as $index => $pendingUser){
+			if($pendingUser->getConnectionID() == $userConn->resourceId){
+				$response['user'] = $pendingUser;
+				$response['index'] = $index;
+				break;
+			}
+		}
+		
+		return $response;
+	}
+	
+	public static function addAuthenticatedUser($user){
+		if($user !== null && $user->isReady()){
+			array_push(self::$users, $user);
+			self::removePendingUser($user);
+			Tool::log('User (' . $user->getConnectionID() . ') is now authenticated.');
+		}
+	}
+	
+	public static function addPendingUser($conn){
+		$response = self::findPendingUser($conn);
+		if($response['user'] === null){
+			$response = self::findByConnection($conn);
+		}
 		
 		if($response['user'] === null){
 			$user = new User($conn);
-			array_push(self::$users, $user);
+			array_push(self::$pendingUsers, $user);
 		}
 	}
 	
@@ -53,6 +84,14 @@ class UserManager {
 			}
 			unset(self::$users[$userResponse['index']]);
 			self::$users = array_values(self::$users);
+		}
+	}
+	
+	public static function removePendingUser($user){
+		if($user !== null){
+			$userResponse = self::findPendingUser($user->getConnection());
+			unset(self::$pendingUsers[$userResponse['index']]);
+			self::$pendingUsers = array_values(self::$pendingUsers);
 		}
 	}
 	
