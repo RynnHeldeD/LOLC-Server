@@ -35,101 +35,103 @@ class App implements MessageComponentInterface {
 		
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::findPendingUser($from);
+		
 		if($response['user'] === null){
 			$response = UserManager::findByConnection($from);
 		}
 		
-		if($response['user'] !== null && ($jsonMsg['action'] == 'pickedChampion' || $response['user']->isReady())) {
+		if($response['user'] !== null){
 			$user = $response['user'];
 			$action = $jsonMsg['action'];
-			switch($action){
-				case 'pickedChampion':
-					$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
-					if($response['error'] === false){
-						Query::pickedChampion($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
-				
-				case "sentTimers":
-					$response = Tool::checkVariables($jsonMsg, array('timers', 'timestamp'));
-					if($response['error'] === false){
-						Query::sentTimers($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
-				
-				case 'timerActivation':
-				var_dump(count(UserManager::$users));
-				var_dump(count(UserManager::$pendingUsers));
-					$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
-					if($response['error'] === false){
-						Query::timerActivation($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
-				
-				case 'switchChannel':
-					$response = Tool::checkVariables($jsonMsg, array('channel'));
-					if($response['error'] === false){
-						Query::switchChannel($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
+			
+			if($action == 'pickedChampion' || $user->isReady()) {
+				switch($action){
+					case 'pickedChampion':
+						$response = Tool::checkVariables($jsonMsg, array('gameId', 'teamId', 'championIconId', 'passphrase'));
+						if($response['error'] === false){
+							Query::pickedChampion($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
 					
-				case 'timerDelay':
-					$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
-					if($response['error'] === false){
-						Query::timerDelay($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
+					case "sentTimers":
+						$response = Tool::checkVariables($jsonMsg, array('timers', 'cdr', 'ultiLevel', 'timestamp'));
+						if($response['error'] === false){
+							Query::sentTimers($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
 					
-				case 'stopTimer':
-					$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
-					if($response['error'] === false){
-						Query::stopTimer($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
+					case 'timerActivation':
+						$response = Tool::checkVariables($jsonMsg, array('idSortGrille', 'timestampDeclenchement'));
+						if($response['error'] === false){
+							Query::timerActivation($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
 					
-				case 'sentCooldown':
-					$response = Tool::checkVariables($jsonMsg, array('champUlti', 'cdr'));
-					if($response['error'] === false){
-						Query::sentCooldown($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
-					
-				case 'shareUltimateLevel':
-					$response = Tool::checkVariables($jsonMsg, array('buttonId', 'ultiLevel'));
-					if($response['error'] === false){
-						Query::shareUltimateLevel($user, $jsonMsg);
-					} else {
-						Message::sendErrorMessage(array($user), $action, $response['message']);
-					}
-					break;
+					case 'switchChannel':
+						$response = Tool::checkVariables($jsonMsg, array('channel'));
+						if($response['error'] === false){
+							Query::switchChannel($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
+						
+					case 'timerDelay':
+						$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+						if($response['error'] === false){
+							Query::timerDelay($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
+						
+					case 'stopTimer':
+						$response = Tool::checkVariables($jsonMsg, array('idSortGrille'));
+						if($response['error'] === false){
+							Query::stopTimer($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
+						
+					case 'sentCooldown':
+						$response = Tool::checkVariables($jsonMsg, array('champUlti', 'cdr'));
+						if($response['error'] === false){
+							Query::sentCooldown($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
+						
+					case 'shareUltimateLevel':
+						$response = Tool::checkVariables($jsonMsg, array('buttonId', 'ultiLevel'));
+						if($response['error'] === false){
+							Query::shareUltimateLevel($user, $jsonMsg);
+						} else {
+							Message::sendErrorMessage(array($user), $action, $response['message']);
+						}
+						break;
 
-				default:
-					Message::sendErrorMessage(array($user), $action, $response['message']);
-					break;
+					default:
+						Message::sendErrorMessage(array($user), $action, "No such action defined or JSON broken.");
+						break;
+				}
+			} else {
+				Tool::log('(' . $user->getConnectionID() . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'error');
+				Message::sendJSON(
+					array($user), 
+					array(
+						'action' => 'requestChampion',
+						'error' => false,
+					)
+				);
 			}
-		} else {
-			Tool::log('(' . $from->resourceId . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'error');
-			Message::sendJSON(
-				$from, 
-				array(
-					'action' => 'requestChampion',
-					'error' => false,
-				)
-			);
 		}
 	}
 

@@ -35,7 +35,7 @@ class UserManager {
 			'user' => null,
 			'index' => -1,
 		);
-		
+
 		foreach(self::$pendingUsers as $index => $pendingUser){
 			if($pendingUser->getConnectionID() == $userConn->resourceId){
 				$response['user'] = $pendingUser;

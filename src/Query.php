@@ -47,7 +47,7 @@ class Query {
 			Tool::log("PickedChampion called on " . $user->getConnectionID() . " but user is not ready after set. Is the jsonMsg correct ?\r\n" . var_dump($jsonMsg) . "\r\n
 			Requesting champion.", 'error');
 			Message::sendJSON(
-				$user, 
+				array($user), 
 				array(
 					'action' => 'requestChampion',
 					'error' => false,
@@ -74,6 +74,8 @@ class Query {
 				'action' => 'sharedTimers',
 				'error' => false,
 				'timers' => $jsonMsg['timers'],
+				'cdr' => $jsonMsg['cdr'],
+				'ultiLevel' => $jsonMsg['ultiLevel'],
 				'timestamp' => $jsonMsg['timestamp']
 			)
 		);
@@ -120,7 +122,7 @@ class Query {
 		} else {
 			Tool::log('Trying to switch channel on a non ready user. Requesting champion.', 'error');
 			Message::sendJSON(
-				$user, 
+				array($user), 
 				array(
 					'action' => 'requestChampion',
 					'error' => false,

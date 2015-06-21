@@ -18,7 +18,6 @@ class Message {
 	
 	public static function sendJson($users, $params, $addShareParam = false){
 		$shared = false;
-		
 		foreach($users as $user){
 			if($addShareParam && $shared){
 				if(isset($params['share'])){
@@ -39,7 +38,7 @@ class Message {
 		$msg = '"action":"' . $action . '", "error":true, "message":"' . $message . '"';
 		foreach($users as $user){
 			$user->getConnection()->send($msg);
-			Tool::log("Error on $action : Sent " . $response['message'], 'server to ('. $user->getConnectionID() .')');
+			Tool::log("Error on " . $action . " : Sent '" . $message . "' to (" . $user->getConnectionID() .')');
 		}
 	}
 }

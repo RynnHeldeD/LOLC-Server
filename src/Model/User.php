@@ -120,7 +120,7 @@ class User {
 		} else {
 			Tool::log("FindAllies called on (" . $this->getConnectionID() . ") but his channel is not set. Querying pickedChampion.", 'error');
 			Message::sendJSON(
-				$this, 
+				array($this), 
 				array(
 					'action' => 'requestChampion',
 					'error' => false,
