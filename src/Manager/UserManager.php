@@ -68,22 +68,29 @@ class UserManager {
 	}
 	
 	public static function remove($conn){
-		$userResponse = self::findByConnection($conn);
-		
+		$userResponse = self::findPendingUser($conn);
 		if($userResponse['user'] !== null){
 			$user = $userResponse['user'];
-			Query::switchChannel($user, array('channel' => ''));
-			$gameResponse = GameManager::getGame($user->getGameId());
-			if($gameResponse['game'] !== null){
-				$game = $gameResponse['game'];
-				$room = $game->getRoom($user->getTeamId());
-				$channelResponse = $room->findChannel("");
-				if($channelResponse['channel'] !== null){
-					$channelResponse['channel']->removeUser($user);
+				unset(self::$pendingUsers[$userResponse['index']]);
+				self::$pendingUsers = array_values(self::$pendingUsers);
+		} else {
+			$userResponse = self::findByConnection($conn);
+			
+			if($userResponse['user'] !== null){
+				$user = $userResponse['user'];
+				Query::switchChannel($user, array('channel' => ''));
+				$gameResponse = GameManager::getGame($user->getGameId());
+				if($gameResponse['game'] !== null){
+					$game = $gameResponse['game'];
+					$room = $game->getRoom($user->getTeamId());
+					$channelResponse = $room->findChannel("");
+					if($channelResponse['channel'] !== null){
+						$channelResponse['channel']->removeUser($user);
+					}
 				}
+				unset(self::$users[$userResponse['index']]);
+				self::$users = array_values(self::$users);
 			}
-			unset(self::$users[$userResponse['index']]);
-			self::$users = array_values(self::$users);
 		}
 	}
 	
