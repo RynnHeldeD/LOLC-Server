@@ -7,10 +7,12 @@ use LoLCompanion\Model\Tool;
 class UserManager {
     public static $users;
     public static $pendingUsers;
+	public static $lastPendingRescue;
 	
 	public static function init(){
 		self::$users = array();
 		self::$pendingUsers = array();
+		self::$lastPendingRescue = strtotime('now');
 	}
 	
 	public static function findByConnection($conn){
@@ -120,5 +122,24 @@ class UserManager {
 		}
 		
 		return $championsIconsId;
+	}
+	
+	public static function rescuePendingUsers(){
+		if(strtotime('now') - self::$lastPendingRescue > 30 && count(self::$pendingUsers > 0)){
+			Tool::log('Rescuing pending users...', 'error');
+			self::$lastPendingRescue = strtotime('now');
+			
+			foreach(self::$pendingUsers as $index => $pendingUser){
+				Tool::log('(' . $user->getConnectionID() . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'error');
+				
+				Message::sendJSON(
+					array($user), 
+					array(
+						'action' => 'requestChampion',
+						'error' => false,
+					)
+				);
+			}
+		}
 	}
 }

@@ -33,6 +33,8 @@ class App implements MessageComponentInterface {
     public function onMessage(ConnectionInterface $from, $msg) {
 		Tool::log('(' . $from->resourceId . ") Incoming query : \r\n" . $msg, 'client');
 		
+		UserManager::rescuePendingUsers();
+		
 		$jsonMsg = Message::read($msg);
 		$response = UserManager::findPendingUser($from);
 		
