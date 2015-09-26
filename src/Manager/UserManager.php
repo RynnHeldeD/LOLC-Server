@@ -130,10 +130,10 @@ class UserManager {
 			self::$lastPendingRescue = strtotime('now');
 			
 			foreach(self::$pendingUsers as $index => $pendingUser){
-				Tool::log('(' . $user->getConnectionID() . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'error');
+				Tool::log('(' . $pendingUser->getConnectionID() . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'error');
 				
 				Message::sendJSON(
-					array($user), 
+					array($pendingUser), 
 					array(
 						'action' => 'requestChampion',
 						'error' => false,
