@@ -3,6 +3,7 @@ namespace LoLCompanion\Manager;
 use LoLCompanion\Model\User;
 use LoLCompanion\Query;
 use LoLCompanion\Model\Tool;
+use LoLCompanion\Model\Message;
 
 class UserManager {
     public static $users;
