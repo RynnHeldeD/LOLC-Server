@@ -127,11 +127,11 @@ class UserManager {
 	
 	public static function rescuePendingUsers(){
 		if(strtotime('now') - self::$lastPendingRescue > 30 && count(self::$pendingUsers > 0)){
-			Tool::log('Rescuing pending users...', 'error');
+			Tool::log('Rescuing pending users...', 'SERVER');
 			self::$lastPendingRescue = strtotime('now');
 			
 			foreach(self::$pendingUsers as $index => $pendingUser){
-				Tool::log('(' . $pendingUser->getConnectionID() . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'error');
+				Tool::log('(' . $pendingUser->getConnectionID() . ") User is null or not ready (no pickedChampion ?). Requesting champion.", 'SERVER');
 				
 				Message::sendJSON(
 					array($pendingUser), 
